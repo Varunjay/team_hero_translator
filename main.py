@@ -1,9 +1,10 @@
 import discord
 import os
-from googletrans import Translator
+from google.cloud import translate_v2 as translate
+import six
 
 client = discord.Client()
-translator = Translator()
+translator = translate.Client()
 
 translation_groups = {}
 translation_groups['general'] = [837977828808458253, 841313609761816626, 841307528121155594, 842043260109324378, 849642737719967754]
@@ -27,6 +28,12 @@ channel_language[841313415958888468] = 'zh-tw'
 channel_language[842043378257625140] = 'ja'
 channel_language[849642967769808896] = 'pt'
 
+def translate_text(target, text):
+    if isinstance(text, six.binary_type):
+        text = text.decode("utf-8")
+    result = translator.translate(text, target_language=target)
+    return result["translatedText"]
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
@@ -40,7 +47,7 @@ async def on_message(message):
             for channel_id in v:
                 if message.channel.id == channel_id:
                     continue
-                translation = translator.translate(message.content, dest = channel_language[channel_id])
+                translation = translate_text(channel_language[channel_id], message.content)
                 embed = discord.Embed(title = '', description = translation.text + '\n\n' + 'via #' + str(message.channel), color = discord.Color.red())
                 embed.set_author(name = message.author.display_name, icon_url = message.author.avatar_url)
                 await client.get_channel(channel_id).send(embed = embed)
