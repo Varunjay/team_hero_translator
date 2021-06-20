@@ -48,7 +48,7 @@ async def on_message(message):
                 if message.channel.id == channel_id:
                     continue
                 translation = translate_text(channel_language[channel_id], message.content)
-                embed = discord.Embed(title = '', description = translation.text + '\n\n' + 'via #' + str(message.channel), color = discord.Color.red())
+                embed = discord.Embed(title = '', description = translation + '\n\n' + 'via #' + str(message.channel), color = discord.Color.red())
                 embed.set_author(name = message.author.display_name, icon_url = message.author.avatar_url)
                 await client.get_channel(channel_id).send(embed = embed)
 
